@@ -39,6 +39,10 @@ MonitorJob <- function(func, job.name) {
       SendSDKMessage(CreateLogMessage(sdk.run.uuid, cond$message))
       outcome <<- kOutcomeFailure
       cond
+    },
+    # Cleanup cluster
+    finally = function() {
+      stopCluster(heartbeatCluster)
     }
   )
   SendSDKMessage(CreateRunEndedMessage(sdk.run.uuid, outcome))    
