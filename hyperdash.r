@@ -80,7 +80,7 @@ CreateHeartbeatMessage <- function(sdk.run.uuid) {
 }
 
 CreateRunStartedMessage <- function(sdk.run.uuid, job.name) {
-  CreateSDKMessage(sdk.run.uuid, kTypeRunStarted, list(job.name=job.name))
+  CreateSDKMessage(sdk.run.uuid, kTypeRunStarted, list(job_name=job.name))
 }
 
 CreateRunEndedMessage <- function(sdk.run.uuid, final.status) {
@@ -94,3 +94,7 @@ CreateLogMessage <- function(sdk.run.uuid, s) {
 CreateSDKMessage <- function(sdk.run.uuid, type, payload) {
   list(type=type, timestamp = trunc(as.numeric(Sys.time()) * 1000, prec = 0), sdk_run_uuid = sdk.run.uuid, payload = payload)
 }
+
+MonitorJob(function(hd.client) {
+  hd.client$print("yolo")
+}, "wtf")
