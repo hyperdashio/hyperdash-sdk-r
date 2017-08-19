@@ -29,10 +29,12 @@ MonitorJob <- function(func, job.name) {
   outcome <- kOutcomeSuccess
   result <- tryCatch(
     func(hd.client=NewHDClient(sdk.run.uuid)),
+    # Log warning
     warning = function(cond) {
       SendSDKMessage(CreateLogMessage(sdk.run.uuid, cond$message))
       cond
     },
+    # Log errors and mark job as failed
     error = function(cond) {
       SendSDKMessage(CreateLogMessage(sdk.run.uuid, cond$message))
       outcome <<- kOutcomeFailure
