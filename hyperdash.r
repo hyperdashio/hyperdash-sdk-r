@@ -8,17 +8,38 @@ kTypeLog <- 'log'
 kTypeHeartbeat <- 'heartbeat'
 
 kOutcomeSuccess <- 'success'
+kOutcomeFailure <- 'failure'
 kLevelInfo <- 'INFO'
+
+kHeartbeatExports <- list("HeartbeatLoop", "SendSDKMessage", "POST", "CreateHeartbeatMessage", "CreateSDKMessage", "kTypeHeartbeat", "add_headers")
 
 MonitorJob <- function(func, job.name) {
   sdk.run.uuid <- UUIDgenerate()
   SendSDKMessage(CreateRunStartedMessage(sdk.run.uuid, job.name))
   # Capture result of user's function
-  # TODO: Catch exceptions
-  # Start background process to heartbeat on a regular basis
-  backgroundHeartbeat = mcparallel(HeartbeatLoop(sdk.run.uuid))
-  result <- func(hd.client=NewHDClient(sdk.run.uuid))
-  SendSDKMessage(CreateRunEndedMessage(sdk.run.uuid, kOutcomeSuccess))
+  # Cluster of size 1 in which we will run the heartbeat code
+  heartbeatCluster = makeCluster(1)
+  # Since we're using the non-forking version of the makeCluster API (to support Windows) we
+  # need to manually export every function that will be used by the heartbeat process.
+  clusterExport(heartbeatCluster, kHeartbeatExports)
+  # Use sendCall instead of clusterCall to schedule work on the cluster without blocking
+  # the main thread of execution.
+  parallel:::sendCall(heartbeatCluster[[1]], HeartbeatLoop, list(sdk.run.uuid))
+  # Capture the result of the user's code so we can return it
+  outcome <- kOutcomeSuccess
+  result <- tryCatch(
+    func(hd.client=NewHDClient(sdk.run.uuid)),
+    warning = function(cond) {
+      SendSDKMessage(CreateLogMessage(sdk.run.uuid, cond$message))
+      cond
+    },
+    error = function(cond) {
+      SendSDKMessage(CreateLogMessage(sdk.run.uuid, cond$message))
+      outcome <<- kOutcomeFailure
+      cond
+    }
+  )
+  SendSDKMessage(CreateRunEndedMessage(sdk.run.uuid, outcome))    
   # Return result of user's function
   result
 }
@@ -67,23 +88,3 @@ CreateLogMessage <- function(sdk.run.uuid, s) {
 CreateSDKMessage <- function(sdk.run.uuid, type, payload) {
   list(type=type, timestamp = trunc(as.numeric(Sys.time()) * 1000, prec = 0), sdk_run_uuid = sdk.run.uuid, payload = payload)
 }
-
-test <- function(hd.client) {
-  hd.client$print("yo")
-  Sys.sleep(1)
-  hd.client$print("yo")  
-  Sys.sleep(1)
-  hd.client$print("yo")  
-  Sys.sleep(1)
-  hd.client$print("yo")
-  Sys.sleep(1)
-  hd.client$print("yo")
-  Sys.sleep(1)
-  hd.client$print("yo")
-  Sys.sleep(1)
-  hd.client$print("yo")
-  Sys.sleep(1)
-  Sys.sleep(120)
-  hd.client$print("done")
-}
-MonitorJob(test, "testRJob")
