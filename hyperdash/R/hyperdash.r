@@ -13,6 +13,32 @@ kLevelInfo <- 'INFO'
 
 kHeartbeatExports <- list("HeartbeatLoop", "SendSDKMessage", "POST", "CreateHeartbeatMessage", "CreateSDKMessage", "kTypeHeartbeat", "add_headers")
 
+#' MonitorJob monitors a machine learning job
+#'
+#' This function helps you monitor a machine learning job. It will
+#' keep track of when the job starts/ends, as well as any logs that
+#' are emitted using the hd_client.print() function.
+#' @param func A function that when invoked, will execute the job you want to monitor.
+#'   Note: The provided function must accept an argument called hd_client
+#'   which will be passed into the function and exposes various Hyperdash
+#'   functionality. For example, if you want to print something, but also have
+#'   it available in your Hyperdash logs, you can call hd_client$print("Your log message here")
+#' @param job.name The name of the job that you want to monitor.
+#' @export
+#' @examples
+#' MonitorJob(function(hd_client) {
+#'   hd_client$print("Begining machine learning...")
+#'   Sys.sleep(2)
+#'   hd_client$print("25% complete...")
+#'   Sys.sleep(2)
+#'   hd_client$print("50% complete...")
+#'   Sys.sleep(2)
+#'   hd_client$print("75% complete...")
+#'   Sys.sleep(2)
+#'   hd_client$print("100% complete...")
+#'   Sys.sleep(2)
+#'   hd_client$print("Done!")
+#' }, "My test hyperdash job")
 MonitorJob <- function(func, job.name) {
   sdk.run.uuid <- UUIDgenerate()
   SendSDKMessage(CreateRunStartedMessage(sdk.run.uuid, job.name))
@@ -62,7 +88,7 @@ NewHDClient <- function(sdk.run.uuid) {
 SendSDKMessage <- function(message) {
   r <- POST(
     "https://hyperdash.io/api/v1/sdk/http",
-    add_headers("x-hyperdash-auth"="LkVFfGuVck0DdDjM5y/o45759MaUklbItvkPfXNQqGY="),
+    add_headers("x-hyperdash-auth"="<REDACTED>"),
     body=message,
     encode="json"
   )
@@ -94,7 +120,3 @@ CreateLogMessage <- function(sdk.run.uuid, s) {
 CreateSDKMessage <- function(sdk.run.uuid, type, payload) {
   list(type=type, timestamp = trunc(as.numeric(Sys.time()) * 1000, prec = 0), sdk_run_uuid = sdk.run.uuid, payload = payload)
 }
-
-MonitorJob(function(hd.client) {
-  hd.client$print("yolo")
-}, "wtf")

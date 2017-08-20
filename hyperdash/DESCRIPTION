@@ -1,0 +1,10 @@
+Package: hyperdash
+Title: Official Python SDK for Hyperdash (https://hyperdash.io)
+Version: 0.0.1
+Authors@R: person("Richard", "Artoul", email = "richardartoul@gmail.com", role = c("aut", "cre"))
+Description: The Hyperdash package is the official R SDK for https://hyperdash.io. Once installed, the SDK automatically monitors your machine learning programs.
+Depends: R (>= 3.4.1)
+License: MIT
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1.9000
