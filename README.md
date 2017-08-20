@@ -62,3 +62,21 @@ The Hyperdash R SDK will always search for your API key in `~/.hyperdash/hyperda
   "api_key": "YOUR_API_KEY_HERE
 }
 ```
+
+## Development
+Clone the repo and make changes!
+
+If any of the changes you make require the documentation to be updated, open an R repl in the `hyperdash` directory and run the following commands:
+
+```r
+library(devtools)
+library(roxygen2)
+document()
+```
+
+Note you may need to install those dependencies by running the following commands:
+
+```r
+install.packages("devtools")
+install.packages("roxygen2")
+```
