@@ -17,7 +17,7 @@ kHyperdashJSONLocation <- "~/.hyperdash/hyperdash.json"
 
 kHeartbeatExports <- list("HeartbeatLoop", "SendSDKMessage", "POST", "CreateHeartbeatMessage", "CreateSDKMessage", "kTypeHeartbeat", "add_headers")
 
-#' MonitorJob monitors a machine learning job
+#' Monitor monitors a machine learning job
 #'
 #' This function helps you monitor a machine learning job. It will
 #' keep track of when the job starts/ends, as well as any logs that
@@ -30,7 +30,7 @@ kHeartbeatExports <- list("HeartbeatLoop", "SendSDKMessage", "POST", "CreateHear
 #' @param job.name The name of the job that you want to monitor.
 #' @export
 #' @examples
-#' MonitorJob(function(hd.client) {
+#' Monitor(function(hd.client) {
 #'   hd.client$print("Begining machine learning...")
 #'   Sys.sleep(2)
 #'   hd.client$print("25% complete...")
@@ -43,7 +43,7 @@ kHeartbeatExports <- list("HeartbeatLoop", "SendSDKMessage", "POST", "CreateHear
 #'   Sys.sleep(2)
 #'   hd.client$print("Done!")
 #' }, "My test hyperdash job")
-MonitorJob <- function(func, job.name) {
+Monitor <- function(func, job.name) {
   api.key <- GetAPIKey()
   # If we can't find an API key, just run their code
   if (is.null(api.key)) {
@@ -160,13 +160,3 @@ GetAPIKey <- function() {
     }
   )
 }
-
-MonitorJob(function(hd.client) {
-  hd.client$print("1")
-  Sys.sleep(2)
-  hd.client$print("2")
-  Sys.sleep(2)
-  hd.client$print("3")
-  Sys.sleep(300)
-  hd.client$print("Done!")
-}, "Test API key reader")
